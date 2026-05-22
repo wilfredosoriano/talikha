@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, StyleSheet } from 'react-native';
+import { View, Text, Animated, StyleSheet, ImageBackground } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
 import { useSettingsStore } from '../store/useSettingsStore';
+
+const loadingBg = require('../assets/images/loading-bg.webp');
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -47,7 +49,8 @@ export default function SplashScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ImageBackground source={loadingBg} style={styles.bgImage} resizeMode="cover">
+      <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
       <View style={styles.content}>
         <View style={styles.iconContainer}>
@@ -62,13 +65,16 @@ export default function SplashScreen() {
         ))}
       </View>
     </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  bgImage: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },

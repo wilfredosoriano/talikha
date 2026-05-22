@@ -29,8 +29,7 @@
     },
     "plugins": [
       "expo-router",
-      "expo-audio",
-      "react-native-purchases"
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true

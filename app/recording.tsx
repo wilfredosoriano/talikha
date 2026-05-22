@@ -6,7 +6,10 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  ImageBackground,
 } from 'react-native';
+
+const recordBg = require('../assets/images/record-bg.webp');
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -104,6 +107,7 @@ export default function RecordingScreen() {
   }
 
   return (
+    <ImageBackground source={recordBg} style={styles.bgImage} resizeMode="cover">
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
 
@@ -132,13 +136,16 @@ export default function RecordingScreen() {
         </View>
       )}
     </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  bgImage: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
     alignItems: 'center',
   },
   topSection: {
