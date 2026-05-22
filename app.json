@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Talikha",
+    "slug": "talikha",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "capture",
+    "splash": {
+      "backgroundColor": "#FAF3E8"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.talikha.app",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Talikha needs microphone access to record your voice notes."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#FAF3E8"
+      },
+      "package": "com.talikha.app",
+      "permissions": [
+        "RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-audio",
+      "react-native-purchases"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
