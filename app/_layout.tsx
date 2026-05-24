@@ -1,15 +1,36 @@
 import React, { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { SQLiteProvider, type SQLiteDatabase } from 'expo-sqlite';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
+import * as Notifications from 'expo-notifications';
 import { initDatabase, getAllCaptures } from '../lib/database';
 import { useCaptureStore } from '../store/useCaptureStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { initPurchases, getCustomerInfo, planFromCustomerInfo } from '../lib/purchases';
+import { setupNotificationChannel } from '../lib/notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 function InnerLayout() {
+  const router = useRouter();
+
+  useEffect(() => {
+    setupNotificationChannel();
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data as { screen?: string };
+      if (data?.screen === 'digest') router.push('/digest');
+    });
+    return () => sub.remove();
+  }, []);
+
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FAF3E8' } }}>
       {/* Tab screens: instant fade so switching tabs feels like tabs, not navigation */}
@@ -28,8 +49,17 @@ function InnerLayout() {
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
+    'Cause-Thin':       require('../assets/fonts/Cause-Thin.ttf'),
+    'Cause-ExtraLight': require('../assets/fonts/Cause-ExtraLight.ttf'),
+    'Cause-Light':      require('../assets/fonts/Cause-Light.ttf'),
+    'Cause-Regular':    require('../assets/fonts/Cause-Regular.ttf'),
+    'Cause-Medium':     require('../assets/fonts/Cause-Medium.ttf'),
+    'Cause-SemiBold':   require('../assets/fonts/Cause-SemiBold.ttf'),
+    'Cause-Bold':       require('../assets/fonts/Cause-Bold.ttf'),
+    'Cause-ExtraBold':  require('../assets/fonts/Cause-ExtraBold.ttf'),
+    'Cause-Black':      require('../assets/fonts/Cause-Black.ttf'),
     Ionicons: require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf'),
-    Feather: require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf'),
+    Feather:  require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf'),
   });
 
   useEffect(() => {

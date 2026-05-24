@@ -13,7 +13,11 @@ interface SettingsStore {
   language: AppLanguage;
   plan: AppPlan;
   onboardingComplete: boolean;
-  totalCapturesCreated: number;
+  capturesCreatedThisMonth: number;
+  captureCountMonth: string; // 'YYYY-MM'
+  digestEnabled: boolean;
+  digestHour: number;
+  digestMinute: number;
   _hasHydrated: boolean;
   setHasHydrated: (val: boolean) => void;
   setNickname: (name: string) => void;
@@ -21,7 +25,9 @@ interface SettingsStore {
   setLanguage: (lang: AppLanguage) => void;
   setPlan: (plan: AppPlan) => void;
   setOnboardingComplete: () => void;
-  incrementTotalCapturesCreated: () => void;
+  incrementMonthlyCaptures: () => void;
+  setDigestEnabled: (enabled: boolean) => void;
+  setDigestTime: (hour: number, minute: number) => void;
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -32,7 +38,11 @@ export const useSettingsStore = create<SettingsStore>()(
       language: 'english',
       plan: 'free',
       onboardingComplete: false,
-      totalCapturesCreated: 0,
+      capturesCreatedThisMonth: 0,
+      captureCountMonth: '',
+      digestEnabled: false,
+      digestHour: 7,
+      digestMinute: 0,
       _hasHydrated: false,
       setHasHydrated: (val) => set({ _hasHydrated: val }),
       setNickname: (nickname) => set({ nickname }),
@@ -40,14 +50,41 @@ export const useSettingsStore = create<SettingsStore>()(
       setLanguage: (language) => set({ language }),
       setPlan: (plan) => set({ plan }),
       setOnboardingComplete: () => set({ onboardingComplete: true }),
-      incrementTotalCapturesCreated: () =>
-        set((state) => ({ totalCapturesCreated: state.totalCapturesCreated + 1 })),
+      setDigestEnabled: (digestEnabled) => set({ digestEnabled }),
+      setDigestTime: (digestHour, digestMinute) => set({ digestHour, digestMinute }),
+      incrementMonthlyCaptures: () =>
+        set((state) => {
+          const currentMonth = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
+          if (state.captureCountMonth !== currentMonth) {
+            // New month — reset counter
+            return { capturesCreatedThisMonth: 1, captureCountMonth: currentMonth };
+          }
+          return { capturesCreatedThisMonth: state.capturesCreatedThisMonth + 1 };
+        }),
     }),
     {
       name: 'capture-settings',
       storage: createJSONStorage(() => AsyncStorage),
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
+      // Exclude _hasHydrated from persistence — it's a runtime flag, not saved data
+      partialize: (state) => ({
+        nickname: state.nickname,
+        avatar: state.avatar,
+        language: state.language,
+        plan: state.plan,
+        onboardingComplete: state.onboardingComplete,
+        capturesCreatedThisMonth: state.capturesCreatedThisMonth,
+        captureCountMonth: state.captureCountMonth,
+        digestEnabled: state.digestEnabled,
+        digestHour: state.digestHour,
+        digestMinute: state.digestMinute,
+      }),
+      onRehydrateStorage: () => (state, error) => {
+        // Set hydrated even on error so the app never hangs on splash
+        if (error) {
+          useSettingsStore.setState({ _hasHydrated: true });
+        } else {
+          state?.setHasHydrated(true);
+        }
       },
     }
   )

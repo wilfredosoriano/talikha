@@ -16,7 +16,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { Share } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { Colors } from '../../constants/colors';
+import { Fonts } from '../../constants/fonts';
 import { useCaptureStore } from '../../store/useCaptureStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { deleteCapture, updateCaptureCategory, markCaptureComplete, updateCaptureFields } from '../../lib/database';
 import CapturePill from '../../components/CapturePill';
 import { formatCaptureTimestamp } from '../../lib/utils';
@@ -29,6 +31,9 @@ export default function DetailScreen() {
   const removeCapture = useCaptureStore((s) => s.removeCapture);
   const updateCapture = useCaptureStore((s) => s.updateCapture);
   const capture = captures.find((c) => c.id === id);
+
+  const plan = useSettingsStore((s) => s.plan);
+  const isPro = plan === 'monthly' || plan === 'lifetime';
 
   const [draftTitle, setDraftTitle] = useState(capture?.title ?? '');
   const [draftSummary, setDraftSummary] = useState(capture?.summary ?? '');
@@ -178,14 +183,18 @@ export default function DetailScreen() {
           )}
         </View>
 
-        <Text style={styles.sectionLabel}>TAGS</Text>
-        <View style={styles.tagsRow}>
-          {capture.tags.map((tag, i) => (
-            <View key={i} style={styles.tagPill}>
-              <Text style={styles.tagText}>#{tag}</Text>
+        {isPro && (
+          <>
+            <Text style={styles.sectionLabel}>TAGS</Text>
+            <View style={styles.tagsRow}>
+              {capture.tags.map((tag, i) => (
+                <View key={i} style={styles.tagPill}>
+                  <Text style={styles.tagText}>#{tag}</Text>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
+          </>
+        )}
 
         <View style={styles.actionRow}>
           <TouchableOpacity
@@ -216,9 +225,11 @@ export default function DetailScreen() {
                 : 'Mark Complete'}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.outlineBtn} onPress={handleExport}>
-            <Text style={styles.outlineBtnText}>Export</Text>
-          </TouchableOpacity>
+          {isPro && (
+            <TouchableOpacity style={styles.outlineBtn} onPress={handleExport}>
+              <Text style={styles.outlineBtnText}>Export</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -243,7 +254,7 @@ const styles = StyleSheet.create({
   },
   screenTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
     color: Colors.darkText,
   },
   scroll: {
@@ -255,7 +266,7 @@ const styles = StyleSheet.create({
   },
   captureTitle: {
     fontSize: 24,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     color: Colors.darkText,
     lineHeight: 30,
     marginBottom: 12,
@@ -294,7 +305,7 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     color: Colors.bodyText,
     letterSpacing: 0.8,
   },
@@ -326,7 +337,7 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 12,
     color: Colors.bodyText,
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
   },
   actionRow: {
     flexDirection: 'row',
@@ -347,7 +358,7 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     color: '#FFFFFF',
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   outlineBtn: {
     flex: 1,
@@ -360,6 +371,6 @@ const styles = StyleSheet.create({
   outlineBtnText: {
     color: Colors.primaryBrown,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
 });

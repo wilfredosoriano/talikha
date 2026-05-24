@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -16,9 +17,11 @@ const talikhaLogo = require('../assets/talikha-logo.png');
 import * as Haptics from 'expo-haptics';
 import { useSQLiteContext } from 'expo-sqlite';
 import { Colors } from '../constants/colors';
+import { Fonts } from '../constants/fonts';
 import { useCaptureStore } from '../store/useCaptureStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { markCaptureComplete } from '../lib/database';
+import { generateDailyInsight } from '../lib/digestInsights';
 import CapturePill from '../components/CapturePill';
 import TabBar from '../components/TabBar';
 import { formatDigestDate, getYesterdayDateString } from '../lib/utils';
@@ -34,9 +37,16 @@ export default function DigestScreen() {
   const updateCapture = useCaptureStore((s) => s.updateCapture);
   const nickname = useSettingsStore((s) => s.nickname);
   const avatar = useSettingsStore((s) => s.avatar);
+  const plan = useSettingsStore((s) => s.plan);
+  const language = useSettingsStore((s) => s.language);
   const displayName = nickname.trim() || 'there';
   const insets = useSafeAreaInsets();
   const ctaBottom = (insets.bottom || 16) + 8 + TAB_BAR_HEIGHT + 12;
+
+  const isPro = plan === 'monthly' || plan === 'lifetime';
+
+  const [insight, setInsight] = useState('');
+  const [insightLoading, setInsightLoading] = useState(false);
 
   const pendingTasks = captures.filter((c) => c.category === 'Task' && !c.completed);
   const ideasCount = captures.filter((c) => c.category === 'Idea').length;
@@ -52,6 +62,14 @@ export default function DigestScreen() {
   }, { Task: [], Idea: [], Note: [], Reference: [] });
 
   const hasYesterday = yesterdayCaptures.length > 0;
+
+  useEffect(() => {
+    if (!isPro || yesterdayCaptures.length === 0) return;
+    setInsightLoading(true);
+    generateDailyInsight(yesterdayCaptures, language, nickname)
+      .then((text) => setInsight(text))
+      .finally(() => setInsightLoading(false));
+  }, [isPro]);
 
   const handleComplete = async (capture: Capture) => {
     const next = !capture.completed;
@@ -74,6 +92,33 @@ export default function DigestScreen() {
             <Text style={styles.greeting}>Good morning, {displayName} 👋</Text>
             <Text style={styles.dateStr}>{formatDigestDate()}</Text>
           </View>
+
+          {/* AI Insight card — Pro/Lifetime only */}
+          {isPro && (insightLoading || insight !== '') && (
+            <View style={styles.insightCard}>
+              <View style={styles.insightHeader}>
+                <Image source={talikhaLogo} style={{ width: 18, height: 18 }} resizeMode="contain" />
+                <Text style={styles.insightLabel}>AI Morning Insight</Text>
+              </View>
+              {insightLoading ? (
+                <ActivityIndicator size="small" color={Colors.primaryBrown} style={{ marginTop: 8 }} />
+              ) : (
+                <Text style={styles.insightText}>{insight}</Text>
+              )}
+            </View>
+          )}
+
+          {/* Pro upsell for AI insight — free users only */}
+          {!isPro && (
+            <TouchableOpacity style={styles.upsellCard} onPress={() => router.push('/upgrade')} activeOpacity={0.8}>
+              <Image source={talikhaLogo} style={{ width: 28, height: 28 }} resizeMode="contain" />
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text style={styles.upsellTitle}>Unlock AI Morning Insights</Text>
+                <Text style={styles.upsellSub}>Get a personalized daily briefing based on your notes.</Text>
+              </View>
+              <Feather name="chevron-right" size={16} color={Colors.tan} />
+            </TouchableOpacity>
+          )}
 
           {/* Stats row */}
           <View style={styles.statsRow}>
@@ -188,10 +233,33 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   scrollContent: { paddingHorizontal: 20, paddingTop: 16 },
 
-  headerCard: { marginBottom: 20, gap: 4 },
+  headerCard: { marginBottom: 16, gap: 4 },
   avatarDisplay: { fontSize: 40, marginBottom: 6 },
-  greeting: { fontSize: 26, fontWeight: '800', color: Colors.darkText, letterSpacing: -0.3 },
+  greeting: { fontSize: 26, fontFamily: Fonts.extraBold, color: Colors.darkText, letterSpacing: -0.3 },
   dateStr: { fontSize: 12, color: Colors.tan, marginTop: 2 },
+
+  insightCard: {
+    backgroundColor: Colors.primaryBrown,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    gap: 8,
+  },
+  insightHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  insightLabel: { fontSize: 11, fontFamily: Fonts.bold, color: 'rgba(255,255,255,0.8)', letterSpacing: 0.6 },
+  insightText: { fontSize: 14, fontFamily: Fonts.regular, color: '#FFF', lineHeight: 22 },
+
+  upsellCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#F5EAD8',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 16,
+  },
+  upsellTitle: { fontSize: 14, fontFamily: Fonts.semiBold, color: Colors.primaryBrown },
+  upsellSub: { fontSize: 12, color: Colors.tan },
 
   statsRow: {
     flexDirection: 'row',
@@ -203,8 +271,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   statCard: { flex: 1, alignItems: 'center', gap: 2 },
-  statNum: { fontSize: 22, fontWeight: '800', color: Colors.primaryBrown },
-  statLabel: { fontSize: 11, color: Colors.tan, fontWeight: '500' },
+  statNum: { fontSize: 22, fontFamily: Fonts.extraBold, color: Colors.primaryBrown },
+  statLabel: { fontSize: 11, color: Colors.tan, fontFamily: Fonts.medium },
   statDivider: { width: 1, backgroundColor: Colors.border, marginVertical: 4 },
 
   groupSection: { marginBottom: 20 },
@@ -214,7 +282,7 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 10,
   },
-  groupTitle: { fontSize: 13, fontWeight: '700', color: Colors.bodyText, flex: 1 },
+  groupTitle: { fontSize: 13, fontFamily: Fonts.bold, color: Colors.bodyText, flex: 1 },
   groupDate: { fontSize: 12, color: Colors.tan },
   catHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
   countBadge: {
@@ -223,7 +291,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 7,
     paddingVertical: 1,
   },
-  countText: { fontSize: 11, fontWeight: '700', color: '#FFFFFF' },
+  countText: { fontSize: 11, fontFamily: Fonts.bold, color: '#FFFFFF' },
 
   taskList: {
     backgroundColor: Colors.card,
@@ -242,7 +310,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   taskCheck: { width: 24, alignItems: 'center' },
-  taskTitle: { flex: 1, fontSize: 14, fontWeight: '500', color: Colors.darkText },
+  taskTitle: { flex: 1, fontSize: 14, fontFamily: Fonts.medium, color: Colors.darkText },
 
   allDoneCard: {
     flexDirection: 'row',
@@ -254,7 +322,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     marginBottom: 24,
   },
-  allDoneText: { fontSize: 14, fontWeight: '600', color: Colors.primaryBrown },
+  allDoneText: { fontSize: 14, fontFamily: Fonts.semiBold, color: Colors.primaryBrown },
 
   card: {
     backgroundColor: Colors.card,
@@ -277,5 +345,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ctaText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+  ctaText: { color: '#FFFFFF', fontSize: 16, fontFamily: Fonts.bold },
 });

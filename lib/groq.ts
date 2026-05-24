@@ -1,5 +1,5 @@
 import type { Category } from './database';
-import type { AppLanguage } from '../store/useSettingsStore';
+import type { AppLanguage, AppPlan } from '../store/useSettingsStore';
 
 const LANGUAGE_INSTRUCTION: Record<AppLanguage, string> = {
   english: 'Always respond in English regardless of the transcript language.',
@@ -52,11 +52,15 @@ export interface ProcessedCapture {
   tags: string[];
 }
 
-export async function processTranscript(transcript: string, language: AppLanguage = 'english', nickname = ''): Promise<ProcessedCapture> {
+export async function processTranscript(transcript: string, language: AppLanguage = 'english', nickname = '', plan: AppPlan = 'free'): Promise<ProcessedCapture> {
   const langInstruction = LANGUAGE_INSTRUCTION[language];
   const nameInstruction = nickname.trim()
     ? `The user's name is "${nickname.trim()}". You may address them by name naturally in the summary when it fits.`
     : '';
+  const isPro = plan === 'monthly' || plan === 'lifetime';
+  const summaryInstruction = isPro
+    ? 'summary as 3 to 5 sentences: cover the key details, highlight any decisions made, and call out action items or next steps clearly'
+    : 'summary as 1 to 2 sentences covering the main point only';
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -66,7 +70,7 @@ export async function processTranscript(transcript: string, language: AppLanguag
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        max_tokens: 1000,
+        max_tokens: isPro ? 1500 : 1000,
         temperature: 0.3,
         messages: [
           {
@@ -75,7 +79,7 @@ export async function processTranscript(transcript: string, language: AppLanguag
           },
           {
             role: 'user',
-            content: `Process this voice transcript and return ONLY a valid JSON object with these exact fields: title as a short descriptive title under 10 words, category as exactly one of Task Idea Note Reference, summary as 1 to 2 sentences, tags as an array of 3 to 5 lowercase keyword strings. Transcript: ${transcript}`,
+            content: `Process this voice transcript and return ONLY a valid JSON object with these exact fields: title as a short descriptive title under 10 words, category as exactly one of Task Idea Note Reference, ${summaryInstruction}, tags as an array of 3 to 5 lowercase keyword strings. Transcript: ${transcript}`,
           },
         ],
       }),

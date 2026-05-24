@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../constants/colors';
+import { Fonts } from '../constants/fonts';
 import { useSettingsStore } from '../store/useSettingsStore';
 
 const talikhaLogo = require('../assets/talikha-logo.png');
@@ -46,13 +47,24 @@ export default function SplashScreen() {
     };
   }, []);
 
-  // Only route after AsyncStorage has finished loading persisted state
+  // Only route after AsyncStorage has finished loading persisted state.
+  // Fallback forces navigation after 3s in case hydration never fires.
   useEffect(() => {
-    if (!hasHydrated) return;
-    const timer = setTimeout(() => {
-      router.replace(onboardingComplete ? '/home' : '/onboarding');
-    }, 2000);
-    return () => clearTimeout(timer);
+    const navigate = () =>
+      router.replace(
+        useSettingsStore.getState().onboardingComplete ? '/home' : '/onboarding'
+      );
+
+    // Fallback: never stay stuck longer than 3 seconds
+    const fallback = setTimeout(navigate, 3000);
+
+    if (hasHydrated) {
+      clearTimeout(fallback);
+      const timer = setTimeout(navigate, 2000);
+      return () => clearTimeout(timer);
+    }
+
+    return () => clearTimeout(fallback);
   }, [hasHydrated]);
 
   return (
@@ -106,13 +118,13 @@ const styles = StyleSheet.create({
   },
   appName: {
     fontSize: 36,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     color: Colors.darkText,
     letterSpacing: -0.5,
   },
   tagline: {
     fontSize: 15,
-    fontWeight: '300',
+    fontFamily: Fonts.light,
     color: Colors.bodyText,
     textAlign: 'center',
   },

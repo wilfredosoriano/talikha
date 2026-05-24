@@ -21,6 +21,7 @@ import {
 } from 'expo-audio';
 import { useSQLiteContext } from 'expo-sqlite';
 import { Colors } from '../constants/colors';
+import { Fonts } from '../constants/fonts';
 import Waveform from '../components/Waveform';
 import { transcribeAudio, processTranscript } from '../lib/groq';
 import { insertCapture } from '../lib/database';
@@ -34,7 +35,8 @@ export default function RecordingScreen() {
   const addCapture = useCaptureStore((s) => s.addCapture);
   const language = useSettingsStore((s) => s.language);
   const nickname = useSettingsStore((s) => s.nickname);
-  const incrementTotalCapturesCreated = useSettingsStore((s) => s.incrementTotalCapturesCreated);
+  const plan = useSettingsStore((s) => s.plan);
+  const incrementMonthlyCaptures = useSettingsStore((s) => s.incrementMonthlyCaptures);
 
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 
@@ -87,7 +89,7 @@ export default function RecordingScreen() {
     if (!transcript) transcript = `Voice note recorded at ${now.toLocaleTimeString()}`;
 
     setProcessingStep('analyzing');
-    const processed = await processTranscript(transcript, language, nickname);
+    const processed = await processTranscript(transcript, language, nickname, plan);
 
     const newCapture: Capture = {
       id: Date.now().toString(),
@@ -102,7 +104,7 @@ export default function RecordingScreen() {
 
     addCapture(newCapture);
     await insertCapture(db, newCapture);
-    incrementTotalCapturesCreated();
+    incrementMonthlyCaptures();
 
     setProcessing(false);
     router.replace(`/detail/${newCapture.id}`);
@@ -158,12 +160,12 @@ const styles = StyleSheet.create({
   listeningText: {
     fontSize: 16,
     color: Colors.bodyText,
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
   },
   timer: {
     fontSize: 22,
     color: Colors.tan,
-    fontWeight: '300',
+    fontFamily: Fonts.light,
     letterSpacing: 1,
   },
   waveformSection: {
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
   stopLabel: {
     fontSize: 12,
     color: Colors.tan,
-    fontWeight: '400',
+    fontFamily: Fonts.regular,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -209,6 +211,6 @@ const styles = StyleSheet.create({
   processingText: {
     fontSize: 15,
     color: Colors.bodyText,
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
   },
 });

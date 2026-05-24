@@ -16,6 +16,7 @@ const talikhaLogo = require('../assets/talikha-logo.png');
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Offering } from 'react-native-purchases';
 import { Colors } from '../constants/colors';
+import { Fonts } from '../constants/fonts';
 import { useSettingsStore, FREE_CAPTURE_LIMIT, type AppPlan } from '../store/useSettingsStore';
 import { fetchOfferings, buyPackage, planFromCustomerInfo } from '../lib/purchases';
 
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   title: {
-    fontSize: 20, fontWeight: '800', color: Colors.darkText,
+    fontSize: 20, fontFamily: Fonts.extraBold, color: Colors.darkText,
     textAlign: 'center', marginBottom: 8,
   },
   sub: {
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
     lineHeight: 20, marginBottom: 16,
   },
   usageRow: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 4 },
-  usageLabel: { fontSize: 12, color: Colors.tan, fontWeight: '600' },
+  usageLabel: { fontSize: 12, color: Colors.tan, fontFamily: Fonts.semiBold },
   barTrack: {
     height: 6, borderRadius: 3,
     backgroundColor: Colors.border, marginBottom: 20, overflow: 'hidden',
@@ -192,14 +193,14 @@ const styles = StyleSheet.create({
     borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2,
     alignSelf: 'flex-start', marginBottom: 8,
   },
-  badgeText: { fontSize: 9, fontWeight: '800', color: '#FFF', letterSpacing: 0.8 },
+  badgeText: { fontSize: 9, fontFamily: Fonts.extraBold, color: '#FFF', letterSpacing: 0.8 },
   planRow: { flexDirection: 'row', alignItems: 'center' },
-  planLabel: { fontSize: 16, fontWeight: '700', color: Colors.darkText },
+  planLabel: { fontSize: 16, fontFamily: Fonts.bold, color: Colors.darkText },
   planLabelLight: { color: '#FFF' },
   planSub: { fontSize: 12, color: Colors.tan, marginTop: 2 },
   planSubLight: { color: 'rgba(255,255,255,0.7)' },
-  planPrice: { fontSize: 22, fontWeight: '800', color: Colors.primaryBrown },
+  planPrice: { fontSize: 22, fontFamily: Fonts.extraBold, color: Colors.primaryBrown },
   planPriceLight: { color: '#FFF' },
   dismissBtn: { alignItems: 'center', paddingVertical: 8 },
-  dismissText: { fontSize: 14, color: Colors.tan, fontWeight: '500' },
+  dismissText: { fontSize: 14, color: Colors.tan, fontFamily: Fonts.medium },
 });

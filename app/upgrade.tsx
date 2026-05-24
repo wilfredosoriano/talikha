@@ -17,6 +17,7 @@ import { Feather } from '@expo/vector-icons';
 const talikhaLogo = require('../assets/talikha-logo.png');
 import type { Offering } from 'react-native-purchases';
 import { Colors } from '../constants/colors';
+import { Fonts } from '../constants/fonts';
 import { useSettingsStore, type AppPlan } from '../store/useSettingsStore';
 import { fetchOfferings, buyPackage, restorePurchases, planFromCustomerInfo } from '../lib/purchases';
 
@@ -67,7 +68,11 @@ const PLANS: PlanDef[] = [
     description: 'Pay once, own forever',
     recommended: false,
     features: [
-      'Everything in Pro',
+      'Unlimited notes',
+      'AI transcription & summaries',
+      'Morning digest & insights',
+      'Tags, categories & export',
+      'Priority support',
       'All future updates included',
       'No recurring charges',
     ],
@@ -279,7 +284,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headline: {
-    fontSize: 28, fontWeight: '800', color: Colors.darkText,
+    fontSize: 28, fontFamily: Fonts.extraBold, color: Colors.darkText,
     letterSpacing: -0.5, marginBottom: 8, textAlign: 'center',
   },
   subhead: {
@@ -309,12 +314,12 @@ const styles = StyleSheet.create({
   },
   badgeSelected: { backgroundColor: 'rgba(255,255,255,0.25)' },
   badgeCurrent: { backgroundColor: Colors.border },
-  badgeText: { fontSize: 9, fontWeight: '800', color: '#FFF', letterSpacing: 0.8 },
-  planLabel: { fontSize: 17, fontWeight: '700', color: Colors.darkText },
+  badgeText: { fontSize: 9, fontFamily: Fonts.extraBold, color: '#FFF', letterSpacing: 0.8 },
+  planLabel: { fontSize: 17, fontFamily: Fonts.bold, color: Colors.darkText },
   planLabelSelected: { color: '#FFF' },
   planDesc: { fontSize: 12, color: Colors.tan },
   planDescSelected: { color: 'rgba(255,255,255,0.7)' },
-  planPrice: { fontSize: 22, fontWeight: '800', color: Colors.primaryBrown },
+  planPrice: { fontSize: 22, fontFamily: Fonts.extraBold, color: Colors.primaryBrown },
   planPriceSelected: { color: '#FFF' },
   planPeriod: { fontSize: 11, color: Colors.tan, marginTop: 2 },
   planPeriodSelected: { color: 'rgba(255,255,255,0.65)' },
@@ -328,16 +333,16 @@ const styles = StyleSheet.create({
     width: '100%', backgroundColor: Colors.primaryBrown,
     borderRadius: 16, paddingVertical: 18, alignItems: 'center', marginBottom: 14,
   },
-  ctaText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
+  ctaText: { color: '#FFF', fontSize: 16, fontFamily: Fonts.bold },
   downgradeBtn: {
     width: '100%', borderWidth: 1.5, borderColor: Colors.border,
     borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginBottom: 14,
   },
-  downgradeText: { color: Colors.bodyText, fontSize: 15, fontWeight: '600' },
+  downgradeText: { color: Colors.bodyText, fontSize: 15, fontFamily: Fonts.semiBold },
   alreadyFreeWrap: { marginBottom: 14, paddingVertical: 16 },
-  alreadyFreeText: { fontSize: 14, color: Colors.tan, fontWeight: '500' },
+  alreadyFreeText: { fontSize: 14, color: Colors.tan, fontFamily: Fonts.medium },
   finePrint: { fontSize: 12, color: Colors.tan, textAlign: 'center' },
   ctaDisabled: { opacity: 0.6 },
   restoreBtn: { alignItems: 'center', paddingVertical: 12 },
-  restoreText: { fontSize: 13, color: Colors.tan, fontWeight: '500' },
+  restoreText: { fontSize: 13, color: Colors.tan, fontFamily: Fonts.medium },
 });

@@ -16,6 +16,7 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 
 const talikhaLogo = require('../assets/talikha-logo.png');
 import { Colors } from '../constants/colors';
+import { Fonts } from '../constants/fonts';
 import { useSettingsStore } from '../store/useSettingsStore';
 
 const SLIDES = ['welcome', 'how', 'setup'] as const;
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
   },
   slideTitle: {
     fontSize: 30,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     color: Colors.darkText,
     letterSpacing: -0.5,
     textAlign: 'center',
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   featureText: { flex: 1, paddingTop: 2 },
-  featureTitle: { fontSize: 15, fontWeight: '700', color: Colors.darkText, marginBottom: 3 },
+  featureTitle: { fontSize: 15, fontFamily: Fonts.bold, color: Colors.darkText, marginBottom: 3 },
   featureDesc: { fontSize: 13, color: Colors.bodyText, lineHeight: 19 },
 
   inputWrap: {
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 17,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
     color: Colors.darkText,
     paddingVertical: 14,
   },
@@ -298,7 +299,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 17,
   },
-  primaryBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
+  primaryBtnText: { color: '#FFF', fontSize: 16, fontFamily: Fonts.bold },
   skipBtn: { alignItems: 'center', paddingVertical: 6 },
-  skipText: { fontSize: 14, color: Colors.tan, fontWeight: '500' },
+  skipText: { fontSize: 14, color: Colors.tan, fontFamily: Fonts.medium },
 });

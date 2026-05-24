@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../constants/colors';
+import { Fonts } from '../constants/fonts';
 
 const AVATAR_EMOJIS = [
   // Faces
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     color: Colors.darkText,
     textAlign: 'center',
     marginBottom: 16,

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../constants/colors';
+import { Fonts } from '../constants/fonts';
 import type { Category } from '../lib/database';
 
 const categoryOpacity: Record<Category, number> = {
@@ -33,6 +34,6 @@ const styles = StyleSheet.create({
   label: {
     color: '#FFFFFF',
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
 });

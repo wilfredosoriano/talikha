@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Feather } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
+import { Fonts } from '../constants/fonts';
 import CapturePill from './CapturePill';
 import { getRelativeTime } from '../lib/utils';
 import type { Capture } from '../lib/database';
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
     color: Colors.darkText,
     lineHeight: 20,
   },

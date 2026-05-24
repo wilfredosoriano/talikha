@@ -19,6 +19,7 @@ const talikhaLogo = require('../assets/talikha-logo.png');
 import * as Haptics from 'expo-haptics';
 import { useSQLiteContext } from 'expo-sqlite';
 import { Colors } from '../constants/colors';
+import { Fonts } from '../constants/fonts';
 import { useCaptureStore } from '../store/useCaptureStore';
 import { useSettingsStore, FREE_CAPTURE_LIMIT } from '../store/useSettingsStore';
 import { markCaptureComplete, deleteCapture } from '../lib/database';
@@ -36,7 +37,7 @@ export default function HomeScreen() {
   const updateCapture = useCaptureStore((s) => s.updateCapture);
   const removeCapture = useCaptureStore((s) => s.removeCapture);
   const plan = useSettingsStore((s) => s.plan);
-  const totalCapturesCreated = useSettingsStore((s) => s.totalCapturesCreated);
+  const capturesCreatedThisMonth = useSettingsStore((s) => s.capturesCreatedThisMonth);
   const insets = useSafeAreaInsets();
   const [paywallVisible, setPaywallVisible] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -47,7 +48,7 @@ export default function HomeScreen() {
   const fabBottom = (insets.bottom || 16) + 8 + TAB_BAR_HEIGHT + 16;
 
   const isFree = plan === 'free';
-  const usagePercent = Math.min(totalCapturesCreated / FREE_CAPTURE_LIMIT, 1);
+  const usagePercent = Math.min(capturesCreatedThisMonth / FREE_CAPTURE_LIMIT, 1);
 
   const visibleCaptures = activeFilter === 'all'
     ? captures
@@ -99,7 +100,7 @@ export default function HomeScreen() {
 
   const handleMicPress = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    if (isFree && totalCapturesCreated >= FREE_CAPTURE_LIMIT) {
+    if (isFree && capturesCreatedThisMonth >= FREE_CAPTURE_LIMIT) {
       setPaywallVisible(true);
       return;
     }
@@ -111,7 +112,7 @@ export default function HomeScreen() {
       <StatusBar style="dark" />
       <PaywallModal
         visible={paywallVisible}
-        used={totalCapturesCreated}
+        used={capturesCreatedThisMonth}
         onClose={() => setPaywallVisible(false)}
       />
       <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -142,24 +143,25 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {!isSearching && (
+        {!isSearching && !isFree && (
           <View style={styles.filterRow}>
-            {(['all', 'Task', 'Idea', 'Note', 'Reference'] as const).map((f) => {
-              const isActive = activeFilter === f;
-              const label = f === 'all' ? 'All' : f;
-              return (
-                <TouchableOpacity
-                  key={f}
-                  style={[styles.filterChip, isActive && styles.filterChipActive]}
-                  onPress={() => setActiveFilter(f)}
-                  activeOpacity={0.75}
-                >
-                  <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+            {(['all', 'Task', 'Idea', 'Note', 'Reference'] as const)
+              .map((f) => {
+                const isActive = activeFilter === f;
+                const label = f === 'all' ? 'All' : f;
+                return (
+                  <TouchableOpacity
+                    key={f}
+                    style={[styles.filterChip, isActive && styles.filterChipActive]}
+                    onPress={() => setActiveFilter(f)}
+                    activeOpacity={0.75}
+                  >
+                    <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
           </View>
         )}
 
@@ -193,9 +195,9 @@ export default function HomeScreen() {
               <View style={styles.usageWrap}>
                 <View style={styles.usageTextRow}>
                   <Text style={styles.usageText}>
-                    {totalCapturesCreated} of {FREE_CAPTURE_LIMIT} free notes used
+                    {capturesCreatedThisMonth} of {FREE_CAPTURE_LIMIT} free notes used
                   </Text>
-                  {totalCapturesCreated >= FREE_CAPTURE_LIMIT && (
+                  {capturesCreatedThisMonth >= FREE_CAPTURE_LIMIT && (
                     <Text style={styles.usageFull}>Limit reached</Text>
                   )}
                 </View>
@@ -283,14 +285,14 @@ const styles = StyleSheet.create({
   },
   appName: {
     fontSize: 26,
-    fontWeight: '800',
+    fontFamily: Fonts.extraBold,
     color: Colors.darkText,
     letterSpacing: -0.5,
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
     color: Colors.darkText,
     paddingVertical: 6,
   },
@@ -316,7 +318,7 @@ const styles = StyleSheet.create({
   },
   filterChipText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
     color: Colors.bodyText,
   },
   filterChipTextActive: { color: '#FFF' },
@@ -328,8 +330,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 5,
   },
-  usageText: { fontSize: 12, color: Colors.tan, fontWeight: '500' },
-  usageFull: { fontSize: 11, color: Colors.primaryBrown, fontWeight: '700' },
+  usageText: { fontSize: 12, color: Colors.tan, fontFamily: Fonts.medium },
+  usageFull: { fontSize: 11, color: Colors.primaryBrown, fontFamily: Fonts.bold },
   barTrack: { height: 4, borderRadius: 2, backgroundColor: Colors.border, overflow: 'hidden' },
   barFill: { height: 4, borderRadius: 2, backgroundColor: Colors.primaryBrown },
   section: { marginBottom: 8 },
@@ -340,14 +342,14 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     gap: 6,
   },
-  sectionLabel: { fontSize: 13, fontWeight: '600', color: Colors.bodyText },
+  sectionLabel: { fontSize: 13, fontFamily: Fonts.semiBold, color: Colors.bodyText },
   countBadge: {
     backgroundColor: Colors.tan,
     borderRadius: 10,
     paddingHorizontal: 7,
     paddingVertical: 1,
   },
-  countText: { fontSize: 11, fontWeight: '700', color: '#FFFFFF' },
+  countText: { fontSize: 11, fontFamily: Fonts.bold, color: '#FFFFFF' },
   emptyState: { alignItems: 'center', paddingTop: 40, gap: 12 },
   emptyText: { fontSize: 15, color: Colors.tan, textAlign: 'center', lineHeight: 22 },
   fab: {

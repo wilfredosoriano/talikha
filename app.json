@@ -4,22 +4,35 @@
     "slug": "talikha",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/talikha-icon.png",
     "userInterfaceStyle": "light",
     "scheme": "capture",
     "splash": {
+      "image": "./assets/android-adaptive-icon.png",
+      "resizeMode": "contain",
       "backgroundColor": "#FAF3E8"
     },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.talikha.app",
+      "icon": "./assets/talikha-icon.png",
+      "splash": {
+        "image": "./assets/android-adaptive-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#FAF3E8"
+      },
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Talikha needs microphone access to record your voice notes."
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/android-adaptive-icon.png",
+        "backgroundColor": "#FAF3E8"
+      },
+      "splash": {
+        "image": "./assets/android-adaptive-icon.png",
+        "resizeMode": "contain",
         "backgroundColor": "#FAF3E8"
       },
       "package": "com.talikha.app",
@@ -29,7 +42,15 @@
     },
     "plugins": [
       "expo-router",
-      "expo-audio"
+      "expo-audio",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/talikha-icon.png",
+          "color": "#C17E3C",
+          "sounds": []
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
