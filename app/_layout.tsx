@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { SQLiteProvider, type SQLiteDatabase } from 'expo-sqlite';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useFonts } from 'expo-font';
 import { initDatabase, getAllCaptures } from '../lib/database';
 import { useCaptureStore } from '../store/useCaptureStore';
 import { useSettingsStore } from '../store/useSettingsStore';
@@ -26,6 +27,11 @@ function InnerLayout() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    Ionicons: require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf'),
+    Feather: require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf'),
+  });
+
   useEffect(() => {
     initPurchases();
     // Sync plan status from RevenueCat on every cold start
@@ -36,6 +42,10 @@ export default function RootLayout() {
       })
       .catch(() => {});
   }, []);
+
+  // fontError can occur on Expo Go when the font is already registered natively;
+  // render anyway so we never block on a blank screen.
+  if (!fontsLoaded && !fontError) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

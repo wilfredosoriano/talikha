@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   Pressable,
+  Image,
   Alert,
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+
+const talikhaLogo = require('../assets/talikha-logo.png');
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Offering } from 'react-native-purchases';
 import { Colors } from '../constants/colors';
@@ -75,7 +77,7 @@ export default function PaywallModal({ visible, used, onClose }: PaywallModalPro
         {/* Header */}
         <View style={styles.iconRow}>
           <View style={styles.iconWrap}>
-            <Ionicons name="mic" size={28} color={Colors.primaryBrown} />
+            <Image source={talikhaLogo} style={{ width: 28, height: 28 }} resizeMode="contain" />
           </View>
         </View>
         <Text style={styles.title}>You've used all {FREE_CAPTURE_LIMIT} free captures</Text>

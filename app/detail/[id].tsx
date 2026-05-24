@@ -92,23 +92,17 @@ export default function DetailScreen() {
   };
 
   const handleExport = async () => {
-    const tags = capture.tags.map((t) => `#${t}`).join(' ');
-    const text = [
+    const hashtags = capture.tags.map((t) => `#${t}`).join(' ');
+    const parts = [
       capture.title,
       '',
-      `Category: ${capture.category}`,
-      tags ? `Tags: ${tags}` : '',
-      '',
-      '— Summary —',
       capture.summary,
+      hashtags ? `\n${hashtags}` : '',
       '',
-      '— Transcript —',
-      capture.transcript,
-    ]
-      .filter((line) => line !== null)
-      .join('\n');
+      'via Talikha',
+    ].filter(Boolean).join('\n');
 
-    await Share.share({ message: text, title: capture.title });
+    await Share.share({ message: parts, title: capture.title });
   };
 
   return (

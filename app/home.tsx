@@ -6,14 +6,16 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
+  Image,
   StyleSheet,
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
+
+const talikhaLogo = require('../assets/talikha-logo.png');
 import * as Haptics from 'expo-haptics';
 import { useSQLiteContext } from 'expo-sqlite';
 import { Colors } from '../constants/colors';
@@ -34,6 +36,7 @@ export default function HomeScreen() {
   const updateCapture = useCaptureStore((s) => s.updateCapture);
   const removeCapture = useCaptureStore((s) => s.removeCapture);
   const plan = useSettingsStore((s) => s.plan);
+  const totalCapturesCreated = useSettingsStore((s) => s.totalCapturesCreated);
   const insets = useSafeAreaInsets();
   const [paywallVisible, setPaywallVisible] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -43,13 +46,8 @@ export default function HomeScreen() {
 
   const fabBottom = (insets.bottom || 16) + 8 + TAB_BAR_HEIGHT + 16;
 
-  const now = new Date();
-  const monthlyCount = captures.filter((c) => {
-    const d = new Date(c.createdAt);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  }).length;
   const isFree = plan === 'free';
-  const usagePercent = Math.min(monthlyCount / FREE_CAPTURE_LIMIT, 1);
+  const usagePercent = Math.min(totalCapturesCreated / FREE_CAPTURE_LIMIT, 1);
 
   const visibleCaptures = activeFilter === 'all'
     ? captures
@@ -101,7 +99,7 @@ export default function HomeScreen() {
 
   const handleMicPress = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    if (isFree && monthlyCount >= FREE_CAPTURE_LIMIT) {
+    if (isFree && totalCapturesCreated >= FREE_CAPTURE_LIMIT) {
       setPaywallVisible(true);
       return;
     }
@@ -113,7 +111,7 @@ export default function HomeScreen() {
       <StatusBar style="dark" />
       <PaywallModal
         visible={paywallVisible}
-        used={monthlyCount}
+        used={totalCapturesCreated}
         onClose={() => setPaywallVisible(false)}
       />
       <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -195,9 +193,9 @@ export default function HomeScreen() {
               <View style={styles.usageWrap}>
                 <View style={styles.usageTextRow}>
                   <Text style={styles.usageText}>
-                    {monthlyCount} of {FREE_CAPTURE_LIMIT} free notes used
+                    {totalCapturesCreated} of {FREE_CAPTURE_LIMIT} free notes used
                   </Text>
-                  {monthlyCount >= FREE_CAPTURE_LIMIT && (
+                  {totalCapturesCreated >= FREE_CAPTURE_LIMIT && (
                     <Text style={styles.usageFull}>Limit reached</Text>
                   )}
                 </View>
@@ -238,7 +236,7 @@ export default function HomeScreen() {
               </View>
               {recentCaptures.length === 0 ? (
                 <View style={styles.emptyState}>
-                  <Ionicons name="mic-outline" size={40} color={Colors.tan} />
+                  <Image source={talikhaLogo} style={{ width: 40, height: 40, opacity: 0.4 }} resizeMode="contain" />
                   <Text style={styles.emptyText}>No notes yet.{'\n'}Tap the mic to start!</Text>
                 </View>
               ) : (
@@ -263,7 +261,7 @@ export default function HomeScreen() {
           onPress={handleMicPress}
           activeOpacity={0.85}
         >
-          <Ionicons name="mic" size={30} color="#FFFFFF" />
+          <Image source={talikhaLogo} style={{ width: 38, height: 38, tintColor: '#FFF' }} resizeMode="contain" />
         </TouchableOpacity>
       )}
 

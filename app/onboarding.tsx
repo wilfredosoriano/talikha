@@ -6,13 +6,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  Image,
   useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
+
+const talikhaLogo = require('../assets/talikha-logo.png');
 import { Colors } from '../constants/colors';
 import { useSettingsStore } from '../store/useSettingsStore';
 
@@ -101,8 +103,8 @@ export default function OnboardingScreen() {
 function WelcomeSlide() {
   return (
     <View style={styles.slideContent}>
-      <View style={styles.iconWrap}>
-        <Ionicons name="mic" size={52} color={Colors.primaryBrown} />
+      <View style={[styles.iconWrap, styles.iconWrapLogo]}>
+        <Image source={talikhaLogo} style={styles.logoImage} resizeMode="contain" />
       </View>
       <Text style={styles.slideTitle}>Meet Talikha</Text>
       <Text style={styles.slideSubtitle}>
@@ -114,22 +116,19 @@ function WelcomeSlide() {
 }
 
 function HowSlide() {
-  const features = [
+  const features: { mic?: boolean; icon?: string; title: string; desc: string }[] = [
     {
-      icon: 'mic' as const,
-      isIonicon: true,
+      mic: true,
       title: 'Just speak',
       desc: 'Record any thought, task, idea, or note. No typing needed.',
     },
     {
-      icon: 'zap' as const,
-      isIonicon: false,
+      icon: 'zap',
       title: 'AI does the work',
       desc: 'We transcribe, summarize, and automatically tag every note.',
     },
     {
-      icon: 'check-circle' as const,
-      isIonicon: false,
+      icon: 'check-circle',
       title: 'Review and act',
       desc: 'Tasks surface to the top. Your digest keeps you on track each morning.',
     },
@@ -143,8 +142,8 @@ function HowSlide() {
         {features.map((f, i) => (
           <View key={i} style={styles.featureRow}>
             <View style={styles.featureIcon}>
-              {f.isIonicon
-                ? <Ionicons name={f.icon as any} size={20} color={Colors.primaryBrown} />
+              {f.mic
+                ? <Ionicons name="mic" size={20} color={Colors.primaryBrown} />
                 : <Feather name={f.icon as any} size={20} color={Colors.primaryBrown} />
               }
             </View>
@@ -205,6 +204,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 32,
+  },
+  iconWrapLogo: {
+    overflow: 'hidden',
+  },
+  logoImage: {
+    width: 80,
+    height: 80,
   },
   slideTitle: {
     fontSize: 30,

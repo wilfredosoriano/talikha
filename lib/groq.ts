@@ -2,14 +2,18 @@ import type { Category } from './database';
 import type { AppLanguage } from '../store/useSettingsStore';
 
 const LANGUAGE_INSTRUCTION: Record<AppLanguage, string> = {
-  auto: 'Detect the language of the transcript automatically (English or Filipino/Tagalog) and respond in that same language.',
   english: 'Always respond in English regardless of the transcript language.',
   filipino: 'Always respond in Filipino (Tagalog) regardless of the transcript language.',
 };
 
 const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY ?? '';
 
-export async function transcribeAudio(fileUri: string): Promise<string> {
+const WHISPER_LANGUAGE: Record<AppLanguage, string> = {
+  english: 'en',
+  filipino: 'tl',
+};
+
+export async function transcribeAudio(fileUri: string, language: AppLanguage = 'english'): Promise<string> {
   try {
     const formData = new FormData();
     formData.append('file', {
@@ -19,7 +23,7 @@ export async function transcribeAudio(fileUri: string): Promise<string> {
     } as unknown as Blob);
     formData.append('model', 'whisper-large-v3-turbo');
     formData.append('response_format', 'text');
-    // No language lock — Whisper auto-detects English, Tagalog, and 99 other languages
+    formData.append('language', WHISPER_LANGUAGE[language]);
 
     const response = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
       method: 'POST',
@@ -48,7 +52,7 @@ export interface ProcessedCapture {
   tags: string[];
 }
 
-export async function processTranscript(transcript: string, language: AppLanguage = 'auto', nickname = ''): Promise<ProcessedCapture> {
+export async function processTranscript(transcript: string, language: AppLanguage = 'english', nickname = ''): Promise<ProcessedCapture> {
   const langInstruction = LANGUAGE_INSTRUCTION[language];
   const nameInstruction = nickname.trim()
     ? `The user's name is "${nickname.trim()}". You may address them by name naturally in the summary when it fits.`

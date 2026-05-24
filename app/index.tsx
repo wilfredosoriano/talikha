@@ -1,22 +1,25 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, Animated, StyleSheet, ImageBackground, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
 import { useSettingsStore } from '../store/useSettingsStore';
+
+const talikhaLogo = require('../assets/talikha-logo.png');
 
 const loadingBg = require('../assets/images/loading-bg.webp');
 
 export default function SplashScreen() {
   const router = useRouter();
   const onboardingComplete = useSettingsStore((s) => s.onboardingComplete);
+  const hasHydrated = useSettingsStore((s) => s._hasHydrated);
 
   const dot1 = useRef(new Animated.Value(1)).current;
   const dot2 = useRef(new Animated.Value(0.5)).current;
   const dot3 = useRef(new Animated.Value(0.2)).current;
 
+  // Start dot animations immediately regardless of hydration
   useEffect(() => {
     const makeDotLoop = (anim: Animated.Value, delay: number) =>
       Animated.loop(
@@ -36,17 +39,21 @@ export default function SplashScreen() {
     loop2.start();
     loop3.start();
 
-    const timer = setTimeout(() => {
-      router.replace(onboardingComplete ? '/home' : '/onboarding');
-    }, 2000);
-
     return () => {
-      clearTimeout(timer);
       loop1.stop();
       loop2.stop();
       loop3.stop();
     };
   }, []);
+
+  // Only route after AsyncStorage has finished loading persisted state
+  useEffect(() => {
+    if (!hasHydrated) return;
+    const timer = setTimeout(() => {
+      router.replace(onboardingComplete ? '/home' : '/onboarding');
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [hasHydrated]);
 
   return (
     <ImageBackground source={loadingBg} style={styles.bgImage} resizeMode="cover">
@@ -54,7 +61,7 @@ export default function SplashScreen() {
       <StatusBar style="dark" />
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <Ionicons name="mic" size={56} color={Colors.primaryBrown} />
+          <Image source={talikhaLogo} style={styles.appLogo} resizeMode="contain" />
         </View>
         <Text style={styles.appName}>Talikha</Text>
         <Text style={styles.tagline}>Your voice. Your thoughts. Organized.</Text>
@@ -83,14 +90,19 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 24,
+    width: 120,
+    height: 120,
+    borderRadius: 28,
     backgroundColor: Colors.card,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: Colors.border,
+    overflow: 'hidden',
+  },
+  appLogo: {
+    width: 100,
+    height: 100,
   },
   appName: {
     fontSize: 36,

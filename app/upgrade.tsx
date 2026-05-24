@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
+  Image,
   StyleSheet,
   Alert,
   ActivityIndicator,
@@ -11,8 +12,9 @@ import {
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
+
+const talikhaLogo = require('../assets/talikha-logo.png');
 import type { Offering } from 'react-native-purchases';
 import { Colors } from '../constants/colors';
 import { useSettingsStore, type AppPlan } from '../store/useSettingsStore';
@@ -60,7 +62,7 @@ const PLANS: PlanDef[] = [
   {
     plan: 'lifetime',
     label: 'Lifetime',
-    price: '₱999',
+    price: '₱599',
     period: 'one-time',
     description: 'Pay once, own forever',
     recommended: false,
@@ -137,7 +139,7 @@ export default function UpgradeScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.iconWrap}>
-            <Ionicons name="mic" size={32} color={Colors.primaryBrown} />
+            <Image source={talikhaLogo} style={{ width: 80, height: 80 }} resizeMode="contain" />
           </View>
           <Text style={styles.headline}>Unlock Talikha</Text>
           <Text style={styles.subhead}>Choose the plan that fits your thinking</Text>
@@ -270,9 +272,10 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   iconWrap: {
-    width: 72, height: 72, borderRadius: 20,
+    width: 100, height: 100, borderRadius: 28,
     backgroundColor: '#F5EAD8',
     alignItems: 'center', justifyContent: 'center',
+    overflow: 'hidden',
     marginBottom: 20,
   },
   headline: {

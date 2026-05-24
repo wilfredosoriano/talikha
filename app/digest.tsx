@@ -4,13 +4,15 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  Image,
   StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
+
+const talikhaLogo = require('../assets/talikha-logo.png');
 import * as Haptics from 'expo-haptics';
 import { useSQLiteContext } from 'expo-sqlite';
 import { Colors } from '../constants/colors';
@@ -140,7 +142,7 @@ export default function DigestScreen() {
 
           {!hasYesterday ? (
             <View style={styles.emptyState}>
-              <Ionicons name="mic-outline" size={36} color={Colors.tan} />
+              <Image source={talikhaLogo} style={{ width: 36, height: 36, opacity: 0.4 }} resizeMode="contain" />
               <Text style={styles.emptyText}>Nothing recorded yesterday.{'\n'}Start today!</Text>
             </View>
           ) : (

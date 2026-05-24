@@ -5,9 +5,12 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Image,
   StyleSheet,
   Linking,
 } from 'react-native';
+
+const talikhaLogo = require('../assets/talikha-logo.png');
 import AvatarPicker from '../components/AvatarPicker';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -28,7 +31,6 @@ type LanguageOption = {
 const LANGUAGE_OPTIONS: LanguageOption[] = [
   { value: 'english',  label: 'English',      description: 'Titles, summaries, and tags always in English.',  flag: '🇺🇸' },
   { value: 'filipino', label: 'Filipino',      description: 'Mga pamagat, buod, at tag sa Filipino.',          flag: '🇵🇭' },
-  { value: 'auto',     label: 'Auto-detect',   description: 'Follows the language you speak in.',              flag: '🌐' },
 ];
 
 const PLAN_LABELS: Record<AppPlan, string> = {
@@ -44,7 +46,7 @@ export default function SettingsScreen() {
   const [pickerVisible, setPickerVisible] = useState(false);
   const insets = useSafeAreaInsets();
 
-  const avatarLetter = (draftName || nickname || '?')[0].toUpperCase();
+  const avatarLetter = (draftName || nickname || '')[0]?.toUpperCase() ?? null;
 
   return (
     <View style={styles.root}>
@@ -70,8 +72,10 @@ export default function SettingsScreen() {
               <TouchableOpacity style={styles.avatar} onPress={() => setPickerVisible(true)} activeOpacity={0.8}>
                 {avatar ? (
                   <Text style={styles.avatarEmoji}>{avatar}</Text>
-                ) : (
+                ) : avatarLetter ? (
                   <Text style={styles.avatarLetter}>{avatarLetter}</Text>
+                ) : (
+                  <Ionicons name="person" size={26} color="#FFF" />
                 )}
                 <View style={styles.avatarEditBadge}>
                   <Feather name="edit-2" size={9} color="#FFF" />
@@ -159,7 +163,7 @@ export default function SettingsScreen() {
             activeOpacity={0.75}
           >
             <View style={styles.planIconWrap}>
-              <Ionicons name="mic" size={20} color={Colors.primaryBrown} />
+              <Image source={talikhaLogo} style={{ width: 28, height: 28 }} resizeMode="contain" />
             </View>
             <View style={styles.planTextWrap}>
               <Text style={styles.planRowLabel}>Talikha Plan</Text>

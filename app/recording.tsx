@@ -34,6 +34,7 @@ export default function RecordingScreen() {
   const addCapture = useCaptureStore((s) => s.addCapture);
   const language = useSettingsStore((s) => s.language);
   const nickname = useSettingsStore((s) => s.nickname);
+  const incrementTotalCapturesCreated = useSettingsStore((s) => s.incrementTotalCapturesCreated);
 
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 
@@ -82,7 +83,7 @@ export default function RecordingScreen() {
     const now = new Date();
 
     setProcessingStep('transcribing');
-    let transcript = uri ? await transcribeAudio(uri) : '';
+    let transcript = uri ? await transcribeAudio(uri, language) : '';
     if (!transcript) transcript = `Voice note recorded at ${now.toLocaleTimeString()}`;
 
     setProcessingStep('analyzing');
@@ -101,6 +102,7 @@ export default function RecordingScreen() {
 
     addCapture(newCapture);
     await insertCapture(db, newCapture);
+    incrementTotalCapturesCreated();
 
     setProcessing(false);
     router.replace(`/detail/${newCapture.id}`);
